@@ -31,7 +31,6 @@ namespace TYManager
             InitializeComponent();
             this.SizeChanged += new SizeChangedEventHandler(OnResize);
         }
-      
         private void btn1_Click(object sender, RoutedEventArgs e)
         {
             /*
