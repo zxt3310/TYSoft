@@ -1,0 +1,17 @@
+﻿<Window x:Class="app001.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:app001"
+        mc:Ignorable="d"
+        Title="子程序" Height="450" Width="800" WindowStyle="None" ResizeMode="CanResize">
+    <Canvas  Name="testPanel" Background="Yellow">
+        <TextBlock x:Name="expText" >这是一段测试文字用来展示子App的嵌套效果</TextBlock>
+        <TextBlock x:Name="expText1" Canvas.Right="0">这是一段测试文字用来展示子App的嵌套效果</TextBlock>
+        <TextBlock x:Name="expText2" Canvas.Bottom="0">这是一段测试文字用来展示子App的嵌套效果</TextBlock>
+        <TextBlock x:Name="expText3" Canvas.Right="0" Canvas.Bottom="0" >这是一段测试文字用来展示子App的嵌套效果</TextBlock>
+        <Button Width="100" Height="50" Canvas.Left="270" Canvas.Top="195" Click="Button_Click">背景蓝</Button>
+        <Button Width="100" Height="50" Canvas.Left="420" Canvas.Top="195" Click="Button_Click_1">背景黄</Button>
+    </Canvas>
+</Window>

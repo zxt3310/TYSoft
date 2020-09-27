@@ -1,0 +1,14 @@
+E:\work\TYManager\TYManager\bin\Release\TYManager.exe.config
+E:\work\TYManager\TYManager\bin\Release\TYManager.exe
+E:\work\TYManager\TYManager\bin\Release\TYManager.pdb
+E:\work\TYManager\TYManager\obj\Release\MainWindow.g.cs
+E:\work\TYManager\TYManager\obj\Release\App.g.cs
+E:\work\TYManager\TYManager\obj\Release\TYManager_MarkupCompile.cache
+E:\work\TYManager\TYManager\obj\Release\TYManager_MarkupCompile.lref
+E:\work\TYManager\TYManager\obj\Release\MainWindow.baml
+E:\work\TYManager\TYManager\obj\Release\TYManager.g.resources
+E:\work\TYManager\TYManager\obj\Release\TYManager.Properties.Resources.resources
+E:\work\TYManager\TYManager\obj\Release\TYManager.csproj.GenerateResource.cache
+E:\work\TYManager\TYManager\obj\Release\TYManager.csproj.CoreCompileInputs.cache
+E:\work\TYManager\TYManager\obj\Release\TYManager.exe
+E:\work\TYManager\TYManager\obj\Release\TYManager.pdb

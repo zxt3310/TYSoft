@@ -1,0 +1,15 @@
+E:\work\TYManager\TYManager\apps\app001\bin\Debug\app001.exe.config
+E:\work\TYManager\TYManager\apps\app001\bin\Debug\app001.exe
+E:\work\TYManager\TYManager\apps\app001\bin\Debug\app001.pdb
+E:\work\TYManager\TYManager\apps\app001\obj\Debug\app001.csprojAssemblyReference.cache
+E:\work\TYManager\TYManager\apps\app001\obj\Debug\MainWindow.g.cs
+E:\work\TYManager\TYManager\apps\app001\obj\Debug\App.g.cs
+E:\work\TYManager\TYManager\apps\app001\obj\Debug\app001_MarkupCompile.cache
+E:\work\TYManager\TYManager\apps\app001\obj\Debug\app001_MarkupCompile.lref
+E:\work\TYManager\TYManager\apps\app001\obj\Debug\MainWindow.baml
+E:\work\TYManager\TYManager\apps\app001\obj\Debug\app001.g.resources
+E:\work\TYManager\TYManager\apps\app001\obj\Debug\app001.Properties.Resources.resources
+E:\work\TYManager\TYManager\apps\app001\obj\Debug\app001.csproj.GenerateResource.cache
+E:\work\TYManager\TYManager\apps\app001\obj\Debug\app001.csproj.CoreCompileInputs.cache
+E:\work\TYManager\TYManager\apps\app001\obj\Debug\app001.exe
+E:\work\TYManager\TYManager\apps\app001\obj\Debug\app001.pdb
