@@ -13,3 +13,7 @@ E:\work\TYManager\TYManager\obj\Debug\TYManager.csproj.CoreCompileInputs.cache
 E:\work\TYManager\TYManager\obj\Debug\TYManager.exe
 E:\work\TYManager\TYManager\obj\Debug\TYManager.pdb
 E:\work\TYManager\TYManager\obj\Debug\TYManager.csprojAssemblyReference.cache
+E:\work\TYManager\TYManager\bin\Debug\log4net.dll
+E:\work\TYManager\TYManager\bin\Debug\Newtonsoft.Json.dll
+E:\work\TYManager\TYManager\bin\Debug\System.Data.SQLite.dll
+E:\work\TYManager\TYManager\obj\Debug\TYManager.csproj.CopyComplete

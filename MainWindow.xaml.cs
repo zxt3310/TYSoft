@@ -16,7 +16,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Runtime.InteropServices;
 using System.Windows.Interop;
-
+using Newtonsoft.Json;
+using System.Dynamic;
 
 namespace TYManager
 {
@@ -26,6 +27,8 @@ namespace TYManager
     public partial class MainWindow : Window
     {
         private IntPtr child;
+
+        static int a, b = 0;
         public MainWindow()
         {
             InitializeComponent();
@@ -33,19 +36,31 @@ namespace TYManager
         }
         private void btn1_Click(object sender, RoutedEventArgs e)
         {
-            /*
-            IntPtr hcalc;
-
-            ProcessStartInfo ps = new ProcessStartInfo();
-
-            ps.FileName = @"app001.exe";
-
-            ps.WorkingDirectory = @"..\..\apps\app001\bin\Debug\";
-
-            Process proc = Process.Start(ps);
-
-            */
             this.LoadExe();
+        }
+
+        private async void requestBtn_Click(object sender, RoutedEventArgs e)
+        {
+           
+                BaiduNetClient baiduNetClient = new BaiduNetClient();
+                //baiduNetClient.BaseUrl = @"www.ranknowcn.com";
+                baiduNetClient.sucNotifer += reqSuc;
+                baiduNetClient.failNotifer += reqFail;
+                baiduNetClient.HttpGetReq(@"webservices/gofish/get.php?a=" + a.ToString() + @"&b=" + b.ToString(), null);
+               // baiduNetClient.HttpGetReq(@"updates/files/RankAllSetup.exe", null);
+                a++; b++;
+           
+        }
+
+        private void reqSuc(dynamic res)
+        {
+            
+            Console.WriteLine(res);
+        }
+
+        private void reqFail(string res)
+        {
+
         }
 
         public const uint WS_CHILD = 0x40000000, WS_POPUP = 0x80000000;
@@ -60,12 +75,12 @@ namespace TYManager
 
         public const uint SWP_SHOWWINDOW = 0x0040, SWP_NOSIZE = 0x0001, SWP_NOZORDER = 0x0004, SWP_FRAMECHANGED = 0x0020, SWP_NOMOVE = 0x0002;
 
-/*        private static int GWL_EXSTYLE = -20;
+        /*        private static int GWL_EXSTYLE = -20;
 
-        private static UInt32 WS_EX_DLGMODALFRAME = 0x00000001;
-        private static UInt32 WS_EX_WINDOWEDGE = 0x00000100;
-        private static UInt32 WS_EX_CLIENTEDGE = 0x00000200;
-        private static UInt32 WS_EX_STATICEDGE = 0x00020000;*/
+                private static UInt32 WS_EX_DLGMODALFRAME = 0x00000001;
+                private static UInt32 WS_EX_WINDOWEDGE = 0x00000100;
+                private static UInt32 WS_EX_CLIENTEDGE = 0x00000200;
+                private static UInt32 WS_EX_STATICEDGE = 0x00020000;*/
 
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         public static extern IntPtr SetParent(IntPtr hWndChild, IntPtr hWndNewParent);
@@ -129,5 +144,11 @@ namespace TYManager
         {
             MoveWindow(child, 0, 0, (int)testPanel.ActualWidth *2, (int)testPanel.ActualHeight*2, true);//嵌入到主程序，并设置窗体位置和大小
         }
+    }
+
+    public class JsonObj
+    {
+        public int a { get; set; }
+        public int b { get; set; }
     }
 }
