@@ -14,42 +14,56 @@ namespace TYManager
 {
     class NetworkClient
     {
-        private static HttpClient httpClient = new HttpClient();
+        private static HttpClient httpClient;
+        private static object obj = new object();
         public delegate void reqSucCallBack(string res);
         public delegate void reqFailCallBack(string res);
         public event reqSucCallBack sucNotifer;
         public event reqFailCallBack failNotifer;
         public NetworkClient()
         {
-
+            if(httpClient == null)
+            {
+                lock (obj)
+                {
+                    if (httpClient == null) {
+                        HttpClientHandler handler = new HttpClientHandler();
+                        handler.MaxConnectionsPerServer = 20;
+                        httpClient = new HttpClient(handler);
+                        httpClient.Timeout = TimeSpan.FromSeconds(20);
+                    }
+                }
+            }
         }
 
         public string BaseUrl { get; set; }
 
         public virtual async void HttpGetReq(string url, Dictionary<string,string> header)
         {
-            HttpRequestMessage request = getRequest(url, HttpMethod.Post, header);
+            HttpRequestMessage request = getRequest(url, HttpMethod.Get, header);
 
-            HttpResponseMessage response = await httpClient.SendAsync(request);
-            if (response == null | response.StatusCode != HttpStatusCode.OK)
+            Task <HttpResponseMessage> responseTask = httpClient.SendAsync(request);
+            HttpResponseMessage response = null;
+            try
             {
-                failNotifer.Invoke(response.ReasonPhrase);
+                response = await responseTask;
+                ExecResult(response);
             }
-            string result = await response.Content.ReadAsStringAsync();
-            sucNotifer.Invoke(result);
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                ExecResult(null);
+            }
+            
         }
 
         public virtual async void HttpPostReq(string url,Dictionary<string,decimal>data, Dictionary<string, string> header)
         {
-            HttpRequestMessage request = getRequest(url,HttpMethod.Get,header);
+            HttpRequestMessage request = getRequest(url,HttpMethod.Post,header);
 
-            HttpResponseMessage response = await httpClient.GetAsync(url);
-            if (response == null | response.StatusCode != HttpStatusCode.OK)
-            {
-                failNotifer.Invoke(response.ReasonPhrase);
-            }
-            string result = await response.Content.ReadAsStringAsync();
-            sucNotifer.Invoke(result);
+            HttpResponseMessage response = await httpClient.SendAsync(request);
+
+            ExecResult(response);
         }
 
         private HttpRequestMessage getRequest(string url,HttpMethod method, Dictionary<string, string> header)
@@ -63,6 +77,22 @@ namespace TYManager
                 }
             }
             return request;
+        }
+
+        private async void ExecResult(HttpResponseMessage response)
+        {
+            if (response == null || response.StatusCode != HttpStatusCode.OK)
+            {
+                failNotifer.Invoke(response==null?"网络错误或超时":response.ReasonPhrase);
+                return;
+            }
+            string result = await response.Content.ReadAsStringAsync();
+            sucNotifer.Invoke(result);
+        }
+
+        public void client_dispose()
+        {
+            httpClient = null;
         }
     }
 

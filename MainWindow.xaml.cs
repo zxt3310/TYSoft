@@ -36,20 +36,26 @@ namespace TYManager
         }
         private void btn1_Click(object sender, RoutedEventArgs e)
         {
-            this.LoadExe();
+            // this.LoadExe();
+
+            BaiduNetClient baiduNetClient = new BaiduNetClient();
+            //baiduNetClient.BaseUrl = @"www.ranknowcn.com";
+            baiduNetClient.sucNotifer += reqSuc;
+            baiduNetClient.failNotifer += reqFail;
+            baiduNetClient.HttpGetReq(@"webservices/gofish/get.php?a=" + a.ToString() + @"&b=" + b.ToString() + @"&sleep=30", null);
+            // baiduNetClient.HttpGetReq(@"updates/files/RankAllSetup.exe", null);
+            a++; b++;
         }
 
-        private async void requestBtn_Click(object sender, RoutedEventArgs e)
+        private void requestBtn_Click(object sender, RoutedEventArgs e)
         {
-           
-                BaiduNetClient baiduNetClient = new BaiduNetClient();
-                //baiduNetClient.BaseUrl = @"www.ranknowcn.com";
-                baiduNetClient.sucNotifer += reqSuc;
-                baiduNetClient.failNotifer += reqFail;
-                baiduNetClient.HttpGetReq(@"webservices/gofish/get.php?a=" + a.ToString() + @"&b=" + b.ToString(), null);
-               // baiduNetClient.HttpGetReq(@"updates/files/RankAllSetup.exe", null);
-                a++; b++;
-           
+            BaiduNetClient baiduNetClient = new BaiduNetClient();
+            //baiduNetClient.BaseUrl = @"www.ranknowcn.com";
+            baiduNetClient.sucNotifer += reqSuc;
+            baiduNetClient.failNotifer += reqFail;
+            baiduNetClient.HttpGetReq(@"webservices/gofish/get.php?a=" + a.ToString() + @"&b=" + b.ToString(), null);
+            // baiduNetClient.HttpGetReq(@"updates/files/RankAllSetup.exe", null);
+            a++; b++;
         }
 
         private void reqSuc(dynamic res)
@@ -60,7 +66,7 @@ namespace TYManager
 
         private void reqFail(string res)
         {
-
+            Console.WriteLine(res);
         }
 
         public const uint WS_CHILD = 0x40000000, WS_POPUP = 0x80000000;
