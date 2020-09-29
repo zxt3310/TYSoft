@@ -9,6 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using System.IO;
 
 namespace TYManager
 {
@@ -18,8 +19,11 @@ namespace TYManager
         private static object obj = new object();
         public delegate void reqSucCallBack(string res);
         public delegate void reqFailCallBack(string res);
+        public delegate void downloadPrograss(long? total, int length);
         public event reqSucCallBack sucNotifer;
         public event reqFailCallBack failNotifer;
+        public event downloadPrograss downloadhook;
+        private const int BufferSize = 8192;
         public NetworkClient()
         {
             if(httpClient == null)
@@ -28,7 +32,7 @@ namespace TYManager
                 {
                     if (httpClient == null) {
                         HttpClientHandler handler = new HttpClientHandler();
-                        handler.MaxConnectionsPerServer = 20;
+                        handler.MaxConnectionsPerServer = 50;//并发
                         httpClient = new HttpClient(handler);
                         httpClient.Timeout = TimeSpan.FromSeconds(20);
                     }
@@ -38,32 +42,89 @@ namespace TYManager
 
         public string BaseUrl { get; set; }
 
-        public virtual async void HttpGetReq(string url, Dictionary<string,string> header)
+        /// <summary>
+        /// start a request of GET 
+        /// </summary>
+        /// <param name="url">Absolute url</param>
+        /// <param name="header">custom HTTP header addition</param>
+        public virtual void HttpGetReq(string url, Dictionary<string,string> header)
         {
             HttpRequestMessage request = getRequest(url, HttpMethod.Get, header);
 
-            Task <HttpResponseMessage> responseTask = httpClient.SendAsync(request);
-            HttpResponseMessage response = null;
-            try
-            {
-                response = await responseTask;
-                ExecResult(response);
-            }
-            catch(Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                ExecResult(null);
-            }
+            startHttpRequest(request);
             
         }
-
-        public virtual async void HttpPostReq(string url,Dictionary<string,decimal>data, Dictionary<string, string> header)
+        /// <summary>
+        /// start a request of POST
+        /// </summary>
+        /// <param name="url">Absolute url</param>
+        /// <param name="data">Body</param>
+        /// <param name="header">custom HTTP header additio</param>
+        public virtual void HttpPostReq(string url,Object data, Dictionary<string, string> header)
         {
             HttpRequestMessage request = getRequest(url,HttpMethod.Post,header);
 
-            HttpResponseMessage response = await httpClient.SendAsync(request);
+            string postStr = JsonConvert.SerializeObject(data);
 
-            ExecResult(response);
+            StringContent body = new StringContent(postStr,Encoding.UTF8);
+
+            request.Content = body;
+
+            startHttpRequest(request);
+        }
+
+        /// <summary>
+        /// start a download request
+        /// </summary>
+        /// <param name="url">Absolute url</param>
+        /// <param name="header">custom HTTP header additio</param>
+        /// <param name="path">File path</param>
+        public virtual async void HttpDownload(string url,Dictionary<string,string> header,string path)
+        {
+            HttpRequestMessage request = getRequest(url, HttpMethod.Get, header);
+
+
+            HttpResponseMessage res;
+            try
+            {
+                res = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+                var content = res.Content;
+                if(content == null)
+                {
+                    failNotifer.Invoke(@"下载失败，文件不存在");
+                    Console.WriteLine("下载失败");
+                    return;
+                }
+                var headers = content.Headers;
+                long? length = headers.ContentLength;
+                using (var responseStream = await content.ReadAsStreamAsync().ConfigureAwait(false))
+                {
+                    Console.WriteLine("开始下载");
+                    var buffer = new byte[BufferSize];
+                    int bytesRead;
+                    var bytes = new List<byte>();
+                    FileStream fileStream = new FileStream(path, FileMode.Create);
+                    while ((bytesRead = await responseStream.ReadAsync(buffer, 0, BufferSize).ConfigureAwait(false)) != 0)
+                    {
+                        fileStream.Write(buffer, 0, bytesRead);
+                        bytes.AddRange(buffer.Take(bytesRead));
+                        if (downloadhook != null)
+                        {
+                            downloadhook.Invoke(length, bytes.Count);
+                        }
+                        Console.WriteLine(string.Format("{0}/{1}", bytes.Count, length));
+                    }
+                    if (sucNotifer != null)
+                    {
+                        sucNotifer.Invoke("下载完成");
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                failNotifer.Invoke(@"下载失败，文件不存在");
+            }
+            
         }
 
         private HttpRequestMessage getRequest(string url,HttpMethod method, Dictionary<string, string> header)
@@ -79,15 +140,36 @@ namespace TYManager
             return request;
         }
 
+        private async void startHttpRequest(HttpRequestMessage request)
+        {
+            Task<HttpResponseMessage> responseTask = httpClient.SendAsync(request);
+            HttpResponseMessage response = null;
+            try
+            {
+                response = await responseTask;
+                ExecResult(response);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                ExecResult(null);
+            }
+        }
         private async void ExecResult(HttpResponseMessage response)
         {
             if (response == null || response.StatusCode != HttpStatusCode.OK)
             {
-                failNotifer.Invoke(response==null?"网络错误或超时":response.ReasonPhrase);
+                if (failNotifer != null)
+                {
+                    failNotifer.Invoke(response == null ? "Net error or Time out!" : response.ReasonPhrase);
+                }
                 return;
             }
             string result = await response.Content.ReadAsStringAsync();
-            sucNotifer.Invoke(result);
+            if (sucNotifer != null)
+            {
+                sucNotifer.Invoke(result);
+            }
         }
 
         public void client_dispose()
@@ -107,6 +189,18 @@ namespace TYManager
         {
             url = this.BaseUrl + url;
             base.HttpGetReq(url, header);
+        }
+
+        public override void HttpPostReq(string url, Object data, Dictionary<string, string> header)
+        {
+            url = this.BaseUrl + url;
+            base.HttpPostReq(url, data, header); 
+        }
+
+        public override void HttpDownload(string url, Dictionary<string, string> header,string path)
+        {
+            url = this.BaseUrl + url;
+            base.HttpDownload(url, header,path);
         }
     }
 }

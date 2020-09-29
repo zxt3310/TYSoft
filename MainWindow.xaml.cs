@@ -42,8 +42,10 @@ namespace TYManager
             //baiduNetClient.BaseUrl = @"www.ranknowcn.com";
             baiduNetClient.sucNotifer += reqSuc;
             baiduNetClient.failNotifer += reqFail;
-            baiduNetClient.HttpGetReq(@"webservices/gofish/get.php?a=" + a.ToString() + @"&b=" + b.ToString() + @"&sleep=30", null);
+            //baiduNetClient.HttpGetReq(@"webservices/gofish/get.php?a=" + a.ToString() + @"&b=" + b.ToString() + @"&sleep=30", null);
             // baiduNetClient.HttpGetReq(@"updates/files/RankAllSetup.exe", null);
+            Dictionary<string, dynamic> dic = new Dictionary<string, dynamic> { { "param","asdfasdfasdf"},{ "a","9"}, { "b", "6" } };
+            baiduNetClient.HttpPostReq(@"webservices/gofish/post.php",dic,null);
             a++; b++;
         }
 
@@ -53,8 +55,10 @@ namespace TYManager
             //baiduNetClient.BaseUrl = @"www.ranknowcn.com";
             baiduNetClient.sucNotifer += reqSuc;
             baiduNetClient.failNotifer += reqFail;
-            baiduNetClient.HttpGetReq(@"webservices/gofish/get.php?a=" + a.ToString() + @"&b=" + b.ToString(), null);
+            //baiduNetClient.HttpGetReq(@"webservices/gofish/get.php?a=" + a.ToString() + @"&b=" + b.ToString(), null);
             // baiduNetClient.HttpGetReq(@"updates/files/RankAllSetup.exe", null);
+            baiduNetClient.downloadhook += download;
+            baiduNetClient.HttpDownload(@"updates/files/RankAllSetup.exe", null,@"e:\file.exe");
             a++; b++;
         }
 
@@ -67,6 +71,11 @@ namespace TYManager
         private void reqFail(string res)
         {
             Console.WriteLine(res);
+        }
+
+        private void download(long? total,int cur)
+        {
+            processor.Value = 50;
         }
 
         public const uint WS_CHILD = 0x40000000, WS_POPUP = 0x80000000;
