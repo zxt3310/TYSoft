@@ -43,10 +43,10 @@ namespace TYManager
         public string BaseUrl { get; set; }
 
         /// <summary>
-        /// start a request of GET 
+        /// start a request with GET 
         /// </summary>
         /// <param name="url">Absolute url</param>
-        /// <param name="header">custom HTTP header addition</param>
+        /// <param name="header">custom HTTP header addition null_able</param>
         public virtual void HttpGetReq(string url, Dictionary<string,string> header)
         {
             HttpRequestMessage request = getRequest(url, HttpMethod.Get, header);
@@ -55,11 +55,11 @@ namespace TYManager
             
         }
         /// <summary>
-        /// start a request of POST
+        /// start a request with POST
         /// </summary>
         /// <param name="url">Absolute url</param>
         /// <param name="data">Body</param>
-        /// <param name="header">custom HTTP header additio</param>
+        /// <param name="header">custom HTTP header addition null_able</param>
         public virtual void HttpPostReq(string url,Object data, Dictionary<string, string> header)
         {
             HttpRequestMessage request = getRequest(url,HttpMethod.Post,header);
@@ -77,7 +77,7 @@ namespace TYManager
         /// start a download request
         /// </summary>
         /// <param name="url">Absolute url</param>
-        /// <param name="header">custom HTTP header additio</param>
+        /// <param name="header">custom HTTP header addition null_able</param>
         /// <param name="path">File path</param>
         public virtual async void HttpDownload(string url,Dictionary<string,string> header,string path)
         {
@@ -91,20 +91,21 @@ namespace TYManager
                 var content = res.Content;
                 if(content == null)
                 {
-                    failNotifer.Invoke(@"下载失败，文件不存在");
-                    Console.WriteLine("下载失败");
+                    failNotifer.Invoke(@"Download faild.File not exist");
+                    LogHelper.WriteLog(res.RequestMessage.RequestUri.AbsoluteUri + " download faild");
                     return;
                 }
                 var headers = content.Headers;
                 long? length = headers.ContentLength;
                 using (var responseStream = await content.ReadAsStreamAsync().ConfigureAwait(false))
                 {
-                    Console.WriteLine("开始下载");
+                    LogHelper.WriteLog("Start downloading " + res.RequestMessage.RequestUri.AbsoluteUri);
+
                     var buffer = new byte[BufferSize];
                     int bytesRead;
                     var bytes = new List<byte>();
                     FileStream fileStream = new FileStream(path, FileMode.Create);
-                    while ((bytesRead = await responseStream.ReadAsync(buffer, 0, BufferSize).ConfigureAwait(false)) != 0)
+                    while ((bytesRead = await responseStream.ReadAsync(buffer, 0, BufferSize).ConfigureAwait(false)) > 0)
                     {
                         fileStream.Write(buffer, 0, bytesRead);
                         bytes.AddRange(buffer.Take(bytesRead));
@@ -116,13 +117,15 @@ namespace TYManager
                     }
                     if (sucNotifer != null)
                     {
-                        sucNotifer.Invoke("下载完成");
+                        sucNotifer.Invoke("successed!");
                     }
+                    fileStream.Close();
                 }
             }
             catch(Exception ex)
             {
-                failNotifer.Invoke(@"下载失败，文件不存在");
+                failNotifer.Invoke(ex.Message);
+                LogHelper.WriteLog(ex.Message, ex);
             }
             
         }
@@ -152,6 +155,7 @@ namespace TYManager
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
+                LogHelper.WriteLog(ex.Message, ex);
                 ExecResult(null);
             }
         }

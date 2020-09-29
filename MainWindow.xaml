@@ -8,7 +8,7 @@
         Title="MainWindow" Height="450" Width="800">
     <Grid x:Name="canView">
         <StackPanel x:Name="testPanel">
-            <ProgressBar x:Name="processor" Margin="50,100" Height="40" BorderBrush="Gray" BorderThickness="4" Background="White">
+            <ProgressBar x:Name="processor" Margin="50,100" Height="40" BorderBrush="Gray" BorderThickness="4" Background="White" ValueChanged="processor_ValueChanged">
             </ProgressBar>
         </StackPanel>
         <Button Name="btn1" Content="百度.exe" Width="100" Height="50"  Click="btn1_Click" Margin="682,359,10,10" RenderTransformOrigin="2.698,3.64"></Button>

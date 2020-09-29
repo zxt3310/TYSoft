@@ -58,7 +58,7 @@ namespace TYManager
             //baiduNetClient.HttpGetReq(@"webservices/gofish/get.php?a=" + a.ToString() + @"&b=" + b.ToString(), null);
             // baiduNetClient.HttpGetReq(@"updates/files/RankAllSetup.exe", null);
             baiduNetClient.downloadhook += download;
-            baiduNetClient.HttpDownload(@"updates/files/RankAllSetup.exe", null,@"e:\file.exe");
+            baiduNetClient.HttpDownload(@"updates/files/RankAllSetup.exe", null,@"RankSetup.exe");
             a++; b++;
         }
 
@@ -73,9 +73,16 @@ namespace TYManager
             Console.WriteLine(res);
         }
 
+        private delegate void SetProcess(double percent);
         private void download(long? total,int cur)
         {
-            processor.Value = 50;
+            double percent = (double)cur / (double)total * 100;
+            this.Dispatcher.Invoke(new SetProcess(updateUI),percent);
+        }
+
+        private void updateUI(double percent)
+        {
+            processor.Value = percent;
         }
 
         public const uint WS_CHILD = 0x40000000, WS_POPUP = 0x80000000;
@@ -89,6 +96,11 @@ namespace TYManager
         public const uint WS_EX_MDICHILD = 0x00000040;
 
         public const uint SWP_SHOWWINDOW = 0x0040, SWP_NOSIZE = 0x0001, SWP_NOZORDER = 0x0004, SWP_FRAMECHANGED = 0x0020, SWP_NOMOVE = 0x0002;
+
+        private void processor_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+
+        }
 
         /*        private static int GWL_EXSTYLE = -20;
 
